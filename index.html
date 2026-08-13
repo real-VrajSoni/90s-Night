@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>R's World — Hits of the 90s</title>
+<meta name="description" content="A 90s Bollywood video-cassette shop that plays. Pick a voice, the shop plays it." />
+<meta name="theme-color" content="#100A07" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=Yesteryear&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/css/style.css" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>📼</text></svg>" />
+</head>
+<body class="is-home is-booting">
+
+  <!-- ============ BACKGROUND ============ -->
+  <div class="stage" id="stage" aria-hidden="true">
+    <video class="stage__video" id="shopVideo" src="assets/video/shop-loop.mp4"
+           poster="assets/img/shop-poster.jpg" muted loop playsinline autoplay preload="auto"></video>
+    <div class="stage__grade"></div>
+  </div>
+
+  <!-- singer backdrops (two layers so they cross-fade) -->
+  <div class="backdrop" id="backdropA" aria-hidden="true"></div>
+  <div class="backdrop" id="backdropB" aria-hidden="true"></div>
+  <div class="backdrop__scrim" aria-hidden="true"></div>
+
+  <!-- ============ THE SHOP TV ============ -->
+  <div class="tv" id="tv" aria-hidden="true">
+    <div class="tv__bezel"></div>
+    <div class="tv__screen">
+      <div class="tv__video" id="tvVideo"><div id="ytPlayer"></div></div>
+      <div class="tv__scan"></div>
+      <div class="tv__glare"></div>
+      <div class="tv__off"></div>
+    </div>
+    <div class="tv__stand"></div>
+  </div>
+
+  <!-- ============ HEADER ============ -->
+  <header class="topbar">
+    <div class="topbar__left">
+      <button class="btn btn--home" id="homeBtn" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.4 12 4l8 7.4V20a1 1 0 0 1-1 1h-4.6v-5.6H9.6V21H5a1 1 0 0 1-1-1z"/></svg>
+        <span>Home</span>
+      </button>
+      <div class="live" id="live" title="People in the shop right now">
+        <span class="live__dot"></span>
+        <span class="live__n" id="liveN">1</span>
+        <span class="live__label">listening now</span>
+      </div>
+    </div>
+
+    <div class="topbar__right">
+      <div class="credit">
+        <span class="credit__made">made with</span>
+        <span class="credit__heart">♥</span>
+        <span class="credit__by">by</span>
+        <button class="credit__name" id="creditBtn" type="button"
+                aria-haspopup="dialog" aria-expanded="false" aria-controls="devCard"
+                title="Developer contact &amp; credits">Vraj Soni</button>
+      </div>
+      <div class="topbar__links">
+        <a class="btn btn--ghost" id="ytmBtn" href="#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m0 3.5A6.5 6.5 0 1 1 5.5 12 6.5 6.5 0 0 1 12 5.5M10 8.6v6.8L16 12z"/></svg>
+          <span>YT Music</span>
+        </a>
+        <a class="btn btn--ghost" id="igBtn" href="#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.6 2h8.8A5.6 5.6 0 0 1 22 7.6v8.8a5.6 5.6 0 0 1-5.6 5.6H7.6A5.6 5.6 0 0 1 2 16.4V7.6A5.6 5.6 0 0 1 7.6 2m0 2A3.6 3.6 0 0 0 4 7.6v8.8A3.6 3.6 0 0 0 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6A3.6 3.6 0 0 0 16.4 4zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10m0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6m5.6-3.1a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4"/></svg>
+          <span>Instagram</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ MAIN ============ -->
+  <main class="shell">
+    <div class="shell__air"></div>
+
+    <!-- mobile-only slot that the TV snaps into -->
+    <div class="tv-slot" id="tvSlot" aria-hidden="true"></div>
+
+    <!-- ---- PLAYER ---- -->
+    <section class="deck" id="deck" aria-label="Music player">
+      <div class="deck__glass">
+        <div class="deck__disc" id="disc">
+          <img id="discArt" alt="" />
+          <span class="deck__hole"></span>
+          <span class="deck__shine"></span>
+        </div>
+
+        <div class="deck__mid">
+          <p class="deck__eyebrow"><span id="deckLabel">90s Night Mixtape</span></p>
+          <div class="deck__titlewrap">
+            <p class="deck__title" id="deckTitle">Warming up the tape deck…</p>
+          </div>
+          <div class="deck__seek" id="seek" role="slider" aria-label="Seek" tabindex="0"
+               aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <span class="deck__seekfill" id="seekFill"></span>
+          </div>
+          <div class="deck__time"><span id="tCur">0:00</span><span id="tDur">0:00</span></div>
+        </div>
+
+        <div class="deck__controls">
+          <button class="ctl" id="prevBtn" type="button" title="Previous track" aria-label="Previous track">
+            <svg viewBox="0 0 24 24"><path d="M7 6h2.4v12H7zM19 6v12l-9-6z"/></svg>
+          </button>
+          <button class="ctl ctl--play" id="playBtn" type="button" title="Play" aria-label="Play">
+            <svg class="i-play" viewBox="0 0 24 24"><path d="M8 5.2 19 12 8 18.8z"/></svg>
+            <svg class="i-pause" viewBox="0 0 24 24"><path d="M7.5 5h3.2v14H7.5zm5.8 0h3.2v14h-3.2z"/></svg>
+          </button>
+          <button class="ctl" id="nextBtn" type="button" title="Next track" aria-label="Next track">
+            <svg viewBox="0 0 24 24"><path d="M14.6 6H17v12h-2.4zM5 6l9 6-9 6z"/></svg>
+          </button>
+          <button class="ctl ctl--list" id="listBtn" type="button" title="Show playlist"
+                  aria-label="Show playlist" aria-expanded="false">
+            <svg viewBox="0 0 24 24"><path d="M3 6h12v2H3zm0 5h12v2H3zm0 5h8v2H3zm14-9.6 5 3.1-5 3.1z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <button class="sound-nudge" id="soundNudge" type="button" hidden>
+        <svg viewBox="0 0 24 24"><path d="M4 9h3.5L12 5v14l-4.5-4H4zm12.5-1.8a5.2 5.2 0 0 1 0 9.6v-2.2a3 3 0 0 0 0-5.2z"/></svg>
+        Tap for sound
+      </button>
+    </section>
+
+    <!-- ---- PLAYLIST SHEET ---- -->
+    <section class="sheet" id="sheet" hidden aria-label="Playlist">
+      <header class="sheet__top">
+        <div>
+          <p class="sheet__eyebrow">Now playing from</p>
+          <h2 class="sheet__title" id="sheetTitle">90s Night Mixtape</h2>
+        </div>
+        <button class="sheet__x" id="sheetClose" type="button" aria-label="Close playlist">
+          <svg viewBox="0 0 24 24"><path d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12 19 17.6 17.6 19 12 13.4 6.4 19 5 17.6 10.6 12 5 6.4z"/></svg>
+        </button>
+      </header>
+      <ol class="sheet__list" id="sheetList"></ol>
+    </section>
+
+    <!-- ---- HEADING ---- -->
+    <div class="pick">
+      <h1 class="pick__line">Choose your 90&rsquo;s voice</h1>
+      <svg class="pick__swash" viewBox="0 0 420 26" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M6 17C74 6 150 5 210 9c58 4 128 6 204 2" />
+        <path class="pick__swash2" d="M40 22c62-6 128-7 186-4" />
+      </svg>
+    </div>
+
+    <!-- ---- CARDS ---- -->
+    <nav class="rack" id="rack" aria-label="Singers"></nav>
+
+    <div class="shell__floor"></div>
+  </main>
+
+  <!-- ============ DEVELOPER CARD (extra) ============ -->
+  <!-- click-anywhere-to-close catcher; never touches the player -->
+  <div class="dev-scrim" id="devScrim" hidden></div>
+
+  <aside class="dev" id="devCard" role="dialog" aria-label="Developer contact and credits" hidden>
+    <div class="dev__tape" aria-hidden="true"><i></i><i></i></div>
+
+    <p class="dev__eyebrow">Designed &amp; built by</p>
+    <p class="dev__name" id="devName">Vraj Soni</p>
+    <p class="dev__role" id="devRole">Front-end &amp; product</p>
+
+    <div class="dev__links">
+      <a class="dev__link" id="devIg" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.6 2h8.8A5.6 5.6 0 0 1 22 7.6v8.8a5.6 5.6 0 0 1-5.6 5.6H7.6A5.6 5.6 0 0 1 2 16.4V7.6A5.6 5.6 0 0 1 7.6 2m0 2A3.6 3.6 0 0 0 4 7.6v8.8A3.6 3.6 0 0 0 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6A3.6 3.6 0 0 0 16.4 4zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10m0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6m5.6-3.1a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4"/></svg>
+        <span>Instagram</span>
+      </a>
+      <a class="dev__link" id="devX" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.2 3h3.3l-7.2 8.2L21.8 21h-6.6l-4.3-5.6L5.9 21H2.6l7.7-8.8L2.5 3h6.8l3.9 5.2zm-1.2 16h1.8L8.1 4.9H6.1z"/></svg>
+        <span>X</span>
+      </a>
+      <a class="dev__link" id="devLi" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.98 3.5A2.5 2.5 0 1 1 2.5 6a2.5 2.5 0 0 1 2.48-2.5M3 8.98h4V21H3zM9.5 8.98h3.83v1.64h.05a4.2 4.2 0 0 1 3.78-2.08C21.2 8.54 22 11 22 14.24V21h-4v-6c0-1.43-.03-3.27-2-3.27s-2.3 1.56-2.3 3.17V21h-4z"/></svg>
+        <span>LinkedIn</span>
+      </a>
+    </div>
+
+    <p class="dev__hint">click anywhere to close</p>
+  </aside>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

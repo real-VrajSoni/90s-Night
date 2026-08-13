@@ -1,0 +1,1075 @@
+/* ==========================================================================
+   R'S WORLD — Hits of the 90s
+   Palette + type are pulled straight out of the shop in the background:
+   marquee-bulb amber, signboard cream, VCD neon, enamel-plate blue.
+   ========================================================================== */
+
+:root{
+  --ink:        #0E0906;
+  --ink-2:      #1A1009;
+  --amber:      #FFB43C;
+  --amber-hi:   #FFD98A;
+  --cream:      #F6E7C8;
+  --cream-dim:  rgba(246,231,200,.62);
+  --neon-pink:  #FF3D7F;
+  --plate:      #0E4C86;
+  --plate-hi:   #3E8BD0;
+
+  /* swapped per singer by the JS */
+  --accent:     #FFB43C;
+
+  --glass:      linear-gradient(180deg, rgba(46,29,17,.42) 0%, rgba(14,9,6,.60) 100%);
+  --hairline:   rgba(246,231,200,.16);
+
+  --f-sign:     'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --f-body:     'Barlow', system-ui, -apple-system, sans-serif;
+  --f-hand:     'Yesteryear', 'Segoe Script', 'Brush Script MT', cursive;
+
+  --ease:       cubic-bezier(.2,.7,.2,1);
+  --gut:        clamp(14px, 2.6vw, 30px);
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+
+html,body{ height:100%; }
+
+body{
+  margin:0;
+  background:var(--ink);
+  color:var(--cream);
+  font-family:var(--f-body);
+  font-size:16px;
+  line-height:1.45;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+img{ display:block; max-width:100%; }
+svg{ width:100%; height:100%; fill:currentColor; }
+button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; }
+a{ color:inherit; text-decoration:none; }
+
+:focus-visible{
+  outline:2px solid var(--amber);
+  outline-offset:3px;
+  border-radius:6px;
+}
+
+/* ==========================================================================
+   1. BACKGROUND — the shop loop, sized to cover but kept on a known grid so
+      the TV overlay can sit exactly on the real CRT in the footage.
+   ========================================================================== */
+
+.stage{
+  position:fixed;
+  inset:auto;                 /* geometry is written by JS */
+  z-index:0;
+  pointer-events:none;
+  will-change:width,height,transform;
+}
+.stage__video{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  transform:scale(1.005);      /* hides sub-pixel edges */
+}
+.stage__grade{
+  position:absolute; inset:0;
+  background:
+    radial-gradient(120% 78% at 50% 26%, rgba(0,0,0,0) 38%, rgba(9,5,3,.62) 100%),
+    linear-gradient(180deg, rgba(9,5,3,.66) 0%, rgba(9,5,3,0) 26%),
+    linear-gradient(0deg, rgba(9,5,3,.80) 0%, rgba(9,5,3,0) 46%);
+}
+
+/* singer backdrops --------------------------------------------------------- */
+.backdrop{
+  position:fixed; inset:0; z-index:1;
+  background-size:cover;
+  background-position:center;
+  opacity:0;
+  transform:scale(1.06);
+  transition:opacity 1s var(--ease), transform 14s linear;
+  pointer-events:none;
+}
+.backdrop.is-on{
+  opacity:1;
+  transform:scale(1.0);
+}
+.backdrop__scrim{
+  position:fixed; inset:0; z-index:2; pointer-events:none;
+  opacity:0;
+  transition:opacity .9s var(--ease);
+  background:
+    radial-gradient(78% 58% at 50% 92%, rgba(8,4,10,.72) 0%, rgba(8,4,10,0) 72%),
+    linear-gradient(180deg, rgba(8,4,10,.55) 0%, rgba(8,4,10,0) 22%);
+}
+body.is-singer .backdrop__scrim{ opacity:1; }
+
+/* ==========================================================================
+   2. THE TV — a real element pinned onto the CRT in the video (desktop) or
+      onto a slot in the layout (small screens). JS writes the box.
+   ========================================================================== */
+
+.tv{
+  position:fixed;
+  z-index:3;
+  transform:rotate(-1.4deg);
+  transform-origin:50% 50%;
+  opacity:0;
+  transition:opacity .55s var(--ease);
+  pointer-events:none;
+}
+body.is-home .tv.is-ready{ opacity:1; }
+
+.tv__bezel{ position:absolute; inset:0; }
+.tv__screen{
+  position:absolute; inset:0;
+  overflow:hidden;
+  background:#05060a;
+  box-shadow:
+    inset 0 0 0 1px rgba(0,0,0,.9),
+    inset 0 0 22px rgba(0,0,0,.85),
+    0 0 34px 6px rgba(120,180,255,.10);
+}
+.tv__video{ position:absolute; inset:0; overflow:hidden; }
+.tv__video iframe{
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  border:0;
+  pointer-events:none;
+}
+.tv__scan{
+  position:absolute; inset:0;
+  background:repeating-linear-gradient(180deg,
+    rgba(0,0,0,.30) 0 1px, rgba(0,0,0,0) 1px 3px);
+  mix-blend-mode:multiply;
+  opacity:.72;
+}
+.tv__glare{
+  position:absolute; inset:0;
+  background:
+    radial-gradient(90% 62% at 50% 50%, rgba(255,255,255,0) 52%, rgba(0,0,0,.55) 100%),
+    linear-gradient(128deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,0) 38%);
+  border-radius:6px / 10px;
+}
+.tv__off{
+  position:absolute; left:0; right:0; top:50%;
+  height:100%;
+  background:#EAF4FF;
+  transform:translateY(-50%) scaleY(0);
+  opacity:0;
+}
+.tv.is-ready .tv__off{ animation:crtOn .62s var(--ease) forwards; }
+@keyframes crtOn{
+  0%   { opacity:1; transform:translateY(-50%) scaleY(.004) scaleX(1); }
+  42%  { opacity:1; transform:translateY(-50%) scaleY(.006) scaleX(1); }
+  70%  { opacity:.85; transform:translateY(-50%) scaleY(1) scaleX(1); }
+  100% { opacity:0; transform:translateY(-50%) scaleY(1) scaleX(1); }
+}
+.tv__stand{ display:none; }
+
+.tv-slot{ display:none; }
+
+/* ==========================================================================
+   3. HEADER
+   ========================================================================== */
+
+.topbar{
+  position:fixed; z-index:20; top:0; left:0; right:0;
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:12px;
+  padding:calc(var(--gut) * .78) var(--gut);
+  padding-top:max(calc(var(--gut) * .78), env(safe-area-inset-top));
+}
+.topbar__left,
+.topbar__right{ display:flex; gap:10px; }
+.topbar__left{ align-items:center; }
+.topbar__right{ flex-direction:column; align-items:flex-end; gap:9px; }
+.topbar__links{ display:flex; gap:8px; }
+
+.btn{
+  display:inline-flex; align-items:center; gap:8px;
+  height:38px; padding:0 15px;
+  border-radius:999px;
+  font-family:var(--f-sign);
+  font-weight:600; font-size:14px;
+  letter-spacing:.12em; text-transform:uppercase;
+  color:var(--cream);
+  background:var(--glass);
+  border:1px solid var(--hairline);
+  -webkit-backdrop-filter:blur(16px) saturate(1.25);
+  backdrop-filter:blur(16px) saturate(1.25);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10), 0 10px 26px rgba(0,0,0,.34);
+  transition:transform .3s var(--ease), border-color .3s, color .3s, background .3s;
+  white-space:nowrap;
+}
+.btn svg{ width:16px; height:16px; flex:none; opacity:.9; }
+.btn:hover{ transform:translateY(-2px); border-color:rgba(255,180,60,.55); color:var(--amber-hi); }
+.btn:active{ transform:translateY(0); }
+
+.btn--home{ color:var(--amber-hi); border-color:rgba(255,180,60,.34); }
+body.is-home .btn--home{ opacity:.5; }
+body.is-home .btn--home:hover{ opacity:.85; }
+
+.live{
+  display:inline-flex; align-items:center; gap:8px;
+  height:38px; padding:0 14px;
+  border-radius:999px;
+  background:rgba(10,6,4,.42);
+  border:1px solid var(--hairline);
+  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(14px);
+  font-family:var(--f-sign);
+  font-size:13.5px; letter-spacing:.10em; text-transform:uppercase;
+  color:var(--cream-dim);
+}
+.live__dot{
+  width:7px; height:7px; border-radius:50%;
+  background:#4ADE80;
+  box-shadow:0 0 0 0 rgba(74,222,128,.7);
+  animation:ping 2.4s ease-out infinite;
+}
+@keyframes ping{
+  0%   { box-shadow:0 0 0 0 rgba(74,222,128,.55); }
+  70%  { box-shadow:0 0 0 9px rgba(74,222,128,0); }
+  100% { box-shadow:0 0 0 0 rgba(74,222,128,0); }
+}
+.live__n{ color:var(--cream); font-weight:700; font-variant-numeric:tabular-nums; }
+
+.credit{
+  display:flex; align-items:baseline; gap:6px;
+  font-family:var(--f-sign);
+  font-size:13px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--cream-dim);
+  text-shadow:0 1px 10px rgba(0,0,0,.65);
+  padding-right:2px;
+}
+.credit__heart{
+  color:var(--neon-pink);
+  font-size:14px;
+  text-shadow:0 0 14px rgba(255,61,127,.85);
+  animation:beat 2.6s ease-in-out infinite;
+  display:inline-block;
+}
+@keyframes beat{
+  0%,72%,100%{ transform:scale(1); }
+  78%       { transform:scale(1.28); }
+  86%       { transform:scale(1.06); }
+}
+.credit__name{
+  font-family:var(--f-hand);
+  font-size:20px;
+  letter-spacing:.01em;
+  text-transform:none;
+  color:var(--amber-hi);
+  text-shadow:0 0 16px rgba(255,180,60,.45);
+  position:relative; top:2px;
+  padding:0 1px;
+  cursor:pointer;
+  transition:color .25s var(--ease), text-shadow .25s var(--ease), transform .25s var(--ease);
+}
+.credit__name::after{                     /* faint hand-drawn underline */
+  content:'';
+  position:absolute; left:0; right:0; bottom:-1px;
+  height:1px;
+  background:currentColor;
+  opacity:.28;
+  transform:scaleX(.82);
+  transform-origin:left;
+  transition:opacity .25s var(--ease), transform .25s var(--ease);
+}
+.credit__name:hover{ color:#FFF0C4; text-shadow:0 0 22px rgba(255,180,60,.75); transform:translateY(-1px); }
+.credit__name:hover::after{ opacity:.7; transform:scaleX(1); }
+.credit__name[aria-expanded="true"]{ color:#FFF0C4; }
+
+/* ==========================================================================
+   3b. DEVELOPER CARD — opens on the name, closes on any click.
+       It sits above everything and never talks to the player.
+   ========================================================================== */
+
+.dev-scrim{
+  position:fixed; inset:0; z-index:40;
+  background:radial-gradient(70% 60% at 78% 6%, rgba(8,4,10,.30) 0%, rgba(8,4,10,.52) 100%);
+  -webkit-backdrop-filter:blur(2px);
+  backdrop-filter:blur(2px);
+  opacity:0;
+  transition:opacity .28s var(--ease);
+}
+.dev-scrim.is-on{ opacity:1; }
+
+.dev{
+  position:fixed; z-index:41;
+  top:76px; right:var(--gut);            /* JS re-anchors this under the name */
+  width:min(272px, calc(100vw - 24px));
+  padding:16px 16px 12px;
+  border-radius:16px;
+  background:
+    linear-gradient(180deg, rgba(52,33,19,.78) 0%, rgba(14,9,6,.92) 100%);
+  border:1px solid rgba(255,180,60,.26);
+  -webkit-backdrop-filter:blur(20px) saturate(1.3);
+  backdrop-filter:blur(20px) saturate(1.3);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.12),
+    0 22px 60px rgba(0,0,0,.62),
+    0 0 40px rgba(255,180,60,.10);
+  transform-origin:100% 0;
+  transform:translateY(-8px) scale(.94);
+  opacity:0;
+  transition:opacity .26s var(--ease), transform .3s var(--ease);
+}
+.dev.is-open{ transform:translateY(0) scale(1); opacity:1; }
+
+/* two little cassette reels, because of course */
+.dev__tape{
+  display:flex; gap:8px; align-items:center;
+  margin-bottom:11px;
+}
+.dev__tape i{
+  width:13px; height:13px; border-radius:50%;
+  border:2px solid rgba(255,180,60,.5);
+  border-top-color:rgba(255,180,60,.12);
+  animation:reel 3.6s linear infinite;
+}
+.dev__tape i:last-child{ animation-duration:5.2s; }
+@keyframes reel{ to{ transform:rotate(360deg); } }
+
+.dev__eyebrow{
+  margin:0;
+  font-family:var(--f-sign);
+  font-size:11px; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--cream-dim);
+}
+.dev__name{
+  margin:1px 0 0;
+  font-family:var(--f-hand);
+  font-size:29px; line-height:1.15;
+  color:var(--amber-hi);
+  text-shadow:0 0 20px rgba(255,180,60,.45);
+}
+.dev__role{
+  margin:3px 0 0;
+  font-size:12.5px;
+  color:var(--cream-dim);
+}
+
+.dev__links{
+  display:flex; flex-direction:column; gap:7px;
+  margin:14px 0 0;
+  padding-top:13px;
+  border-top:1px solid var(--hairline);
+}
+.dev__link{
+  display:flex; align-items:center; gap:10px;
+  height:40px; padding:0 13px;
+  border-radius:11px;
+  background:rgba(246,231,200,.05);
+  border:1px solid var(--hairline);
+  font-family:var(--f-sign);
+  font-weight:600; font-size:13.5px;
+  letter-spacing:.13em; text-transform:uppercase;
+  color:var(--cream);
+  transition:transform .22s var(--ease), background .22s, border-color .22s, color .22s;
+}
+.dev__link svg{ width:17px; height:17px; flex:none; opacity:.85; }
+.dev__link:hover{
+  transform:translateX(3px);
+  background:rgba(255,180,60,.13);
+  border-color:rgba(255,180,60,.5);
+  color:var(--amber-hi);
+}
+.dev__link:active{ transform:translateX(0); }
+
+.dev__hint{
+  margin:11px 0 0;
+  text-align:center;
+  font-family:var(--f-sign);
+  font-size:10.5px; letter-spacing:.18em; text-transform:uppercase;
+  color:rgba(246,231,200,.4);
+}
+
+@media (prefers-reduced-motion: reduce){
+  .dev{ transition:opacity .2s linear; transform:none; }
+  .dev.is-open{ transform:none; }
+  .dev__tape i{ animation:none; }
+}
+
+/* ==========================================================================
+   4. LAYOUT SHELL
+   ========================================================================== */
+
+.shell{
+  position:relative; z-index:10;
+  min-height:100vh;
+  min-height:100dvh;
+  display:flex; flex-direction:column; align-items:center;
+  padding:0 var(--gut) calc(var(--gut) * .62);
+  padding-bottom:max(calc(var(--gut) * .62), env(safe-area-inset-bottom));
+}
+.shell__air{ flex:1 1 auto; min-height:44px; }
+.shell__floor{ display:none; }
+
+/* ==========================================================================
+   5. THE DECK (music player) — centred, sitting on the "New Arrivals" line
+   ========================================================================== */
+
+.deck{
+  position:relative;
+  width:min(560px, 100%);
+  margin:0 auto;
+  animation:rise .9s var(--ease) .15s both;
+}
+.deck__glass{
+  position:relative;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:clamp(12px, 1.6vw, 18px);
+  padding:12px clamp(13px, 1.8vw, 18px);
+  border-radius:20px;
+  background:var(--glass);
+  border:1px solid var(--hairline);
+  -webkit-backdrop-filter:blur(22px) saturate(1.35);
+  backdrop-filter:blur(22px) saturate(1.35);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.12),
+    inset 0 -1px 0 rgba(0,0,0,.35),
+    0 26px 60px rgba(0,0,0,.48);
+  overflow:hidden;
+  transition:box-shadow .6s var(--ease), border-color .6s;
+}
+.deck__glass::after{           /* accent bloom that follows the singer */
+  content:'';
+  position:absolute; inset:-40% -10% auto -10%; height:120%;
+  background:radial-gradient(60% 100% at 18% 0%, var(--accent) 0%, transparent 68%);
+  opacity:.16;
+  pointer-events:none;
+  transition:opacity .8s var(--ease), background .8s var(--ease);
+}
+body.is-playing .deck__glass{ border-color:color-mix(in srgb, var(--accent) 34%, var(--hairline)); }
+
+/* — the disc — */
+.deck__disc{
+  position:relative;
+  width:clamp(54px, 7.4vw, 68px);
+  aspect-ratio:1;
+  border-radius:50%;
+  overflow:hidden;
+  flex:none;
+  background:#241812;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.7),
+    0 0 0 3px rgba(246,231,200,.10),
+    0 10px 22px rgba(0,0,0,.5);
+  animation:spin 9s linear infinite;
+  animation-play-state:paused;
+}
+body.is-playing .deck__disc{ animation-play-state:running; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+.deck__disc img{ width:100%; height:100%; object-fit:cover; opacity:.92; }
+.deck__hole{
+  position:absolute; top:50%; left:50%;
+  width:26%; aspect-ratio:1;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:radial-gradient(circle, #100A07 42%, #2A1B12 44%, #100A07 100%);
+  box-shadow:0 0 0 1px rgba(0,0,0,.8), inset 0 0 6px rgba(0,0,0,.9);
+}
+.deck__shine{
+  position:absolute; inset:0; border-radius:50%;
+  background:conic-gradient(from 210deg,
+    rgba(255,255,255,0) 0deg, rgba(255,255,255,.30) 32deg,
+    rgba(255,255,255,0) 92deg, rgba(255,255,255,0) 210deg,
+    rgba(255,255,255,.20) 246deg, rgba(255,255,255,0) 300deg);
+  mix-blend-mode:screen;
+}
+
+/* — middle column — */
+.deck__mid{ min-width:0; }
+.deck__eyebrow{
+  margin:0 0 2px;
+  font-family:var(--f-sign);
+  font-size:11px; font-weight:600;
+  letter-spacing:.22em; text-transform:uppercase;
+  color:color-mix(in srgb, var(--accent) 72%, var(--cream));
+  opacity:.9;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.deck__titlewrap{ overflow:hidden; }
+.deck__title{
+  margin:0;
+  will-change:transform;
+  font-family:var(--f-sign);
+  font-size:clamp(16px, 1.5vw, 19px);
+  font-weight:600;
+  letter-spacing:.015em;
+  color:var(--cream);
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  overflow:hidden;
+}
+.deck__title.is-long{
+  text-overflow:clip;
+  animation:marquee 17s linear infinite;
+}
+@keyframes marquee{
+  0%,10%   { transform:translateX(0); }
+  46%,56%  { transform:translateX(var(--shift, 0px)); }
+  92%,100% { transform:translateX(0); }
+}
+.deck__seek{
+  position:relative;
+  height:3px; margin-top:9px;
+  border-radius:999px;
+  background:rgba(246,231,200,.16);
+  cursor:pointer;
+}
+.deck__seek::before{ content:''; position:absolute; inset:-9px 0; }
+.deck__seekfill{
+  position:absolute; inset:0 auto 0 0;
+  width:0%;
+  border-radius:999px;
+  background:linear-gradient(90deg, color-mix(in srgb, var(--accent) 70%, #fff) 0%, var(--accent) 100%);
+  box-shadow:0 0 10px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+.deck__seekfill::after{
+  content:'';
+  position:absolute; right:-3px; top:50%;
+  width:7px; height:7px; margin-top:-3.5px;
+  border-radius:50%;
+  background:#fff;
+  opacity:0;
+  transition:opacity .25s;
+}
+.deck__seek:hover .deck__seekfill::after{ opacity:1; }
+.deck__time{
+  display:flex; justify-content:space-between;
+  margin-top:4px;
+  font-family:var(--f-sign);
+  font-size:11px; letter-spacing:.10em;
+  color:var(--cream-dim);
+  font-variant-numeric:tabular-nums;
+}
+
+/* — controls — */
+.deck__controls{ display:flex; align-items:center; gap:clamp(2px, .8vw, 6px); }
+.ctl{
+  display:grid; place-items:center;
+  width:38px; height:38px;
+  border-radius:50%;
+  color:var(--cream);
+  opacity:.82;
+  transition:transform .28s var(--ease), opacity .28s, background .28s, color .28s;
+}
+.ctl svg{ width:19px; height:19px; }
+.ctl:hover{ opacity:1; transform:scale(1.12); color:var(--amber-hi); }
+.ctl:active{ transform:scale(.94); }
+
+.ctl--play{
+  width:46px; height:46px;
+  color:var(--ink);
+  background:linear-gradient(180deg, var(--amber-hi), var(--amber));
+  box-shadow:0 8px 22px rgba(255,180,60,.30), inset 0 1px 0 rgba(255,255,255,.6);
+  opacity:1;
+}
+.ctl--play:hover{ color:var(--ink); transform:scale(1.07); }
+.ctl--play svg{ width:20px; height:20px; }
+.ctl--play .i-pause{ display:none; }
+body.is-playing .ctl--play .i-play{ display:none; }
+body.is-playing .ctl--play .i-pause{ display:block; }
+
+.ctl--list{ margin-left:2px; }
+.ctl--list.is-open{ color:var(--amber); opacity:1; background:rgba(255,180,60,.14); }
+
+/* — sound nudge — */
+.sound-nudge{
+  position:absolute; left:auto; right:6px; bottom:calc(100% + 8px);
+  transform:none;
+  display:inline-flex; align-items:center; gap:8px;
+  padding:8px 15px;
+  border-radius:999px;
+  background:rgba(255,180,60,.94);
+  color:#170D05;
+  font-family:var(--f-sign);
+  font-size:13px; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase;
+  box-shadow:0 10px 28px rgba(0,0,0,.4);
+  animation:nudge 2.2s ease-in-out infinite;
+  white-space:nowrap;
+  z-index:4;
+}
+.sound-nudge svg{ width:15px; height:15px; }
+@keyframes nudge{
+  0%,100%{ transform:translateY(0); }
+  50%    { transform:translateY(-5px); }
+}
+
+/* ==========================================================================
+   6. PLAYLIST SHEET
+   ========================================================================== */
+
+.sheet{
+  position:fixed; z-index:30;
+  left:50%; transform:translateX(-50%) translateY(14px);
+  bottom:auto;
+  width:min(560px, calc(100vw - var(--gut) * 2));
+  max-height:min(46vh, 420px);   /* JS narrows this to the real gap above the deck */
+  display:flex; flex-direction:column;
+  border-radius:20px;
+  background:linear-gradient(180deg, rgba(30,19,11,.86) 0%, rgba(12,8,5,.92) 100%);
+  border:1px solid var(--hairline);
+  -webkit-backdrop-filter:blur(26px) saturate(1.3);
+  backdrop-filter:blur(26px) saturate(1.3);
+  box-shadow:0 30px 70px rgba(0,0,0,.6);
+  overflow:hidden;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .35s var(--ease), transform .45s var(--ease);
+}
+.sheet.is-open{ opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
+
+.sheet__top{
+  display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+  padding:14px 16px 10px;
+  border-bottom:1px solid rgba(246,231,200,.10);
+}
+.sheet__eyebrow{
+  margin:0;
+  font-family:var(--f-sign); font-size:11px;
+  letter-spacing:.22em; text-transform:uppercase;
+  color:var(--cream-dim);
+}
+.sheet__title{
+  margin:1px 0 0;
+  font-family:var(--f-sign); font-size:19px; font-weight:700;
+  letter-spacing:.05em;
+  color:var(--cream);
+}
+.sheet__x{
+  width:30px; height:30px; flex:none;
+  display:grid; place-items:center;
+  border-radius:50%;
+  color:var(--cream-dim);
+  transition:color .25s, background .25s;
+}
+.sheet__x svg{ width:15px; height:15px; }
+.sheet__x:hover{ color:var(--cream); background:rgba(246,231,200,.10); }
+
+.sheet__list{
+  margin:0; padding:6px;
+  list-style:none;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(246,231,200,.28) transparent;
+}
+.sheet__list::-webkit-scrollbar{ width:8px; }
+.sheet__list::-webkit-scrollbar-thumb{ background:rgba(246,231,200,.22); border-radius:99px; }
+
+.row{
+  display:grid;
+  grid-template-columns:22px 44px minmax(0,1fr);
+  align-items:center; gap:11px;
+  width:100%;
+  padding:7px 9px;
+  border-radius:12px;
+  text-align:left;
+  transition:background .22s, transform .22s var(--ease);
+}
+.row:hover{ background:rgba(246,231,200,.08); transform:translateX(3px); }
+.row__n{
+  font-family:var(--f-sign); font-size:12px;
+  letter-spacing:.08em; color:var(--cream-dim);
+  font-variant-numeric:tabular-nums; text-align:center;
+}
+.row__thumb{
+  width:44px; height:33px;
+  border-radius:5px; overflow:hidden;
+  background:#241812;
+  box-shadow:0 0 0 1px rgba(0,0,0,.5);
+}
+.row__thumb img{ width:100%; height:100%; object-fit:cover; }
+.row__t{
+  font-family:var(--f-sign); font-size:15px; font-weight:500;
+  letter-spacing:.02em; color:var(--cream);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.row.is-current{ background:color-mix(in srgb, var(--accent) 14%, transparent); }
+.row.is-current .row__t{ color:var(--accent); font-weight:700; }
+.row.is-current .row__n{ color:var(--accent); }
+
+.bars{ display:inline-flex; align-items:flex-end; gap:2px; height:12px; }
+.bars i{
+  width:2px; height:100%;
+  background:var(--accent);
+  transform-origin:bottom;
+  animation:bar .9s ease-in-out infinite;
+}
+.bars i:nth-child(2){ animation-delay:.18s; }
+.bars i:nth-child(3){ animation-delay:.36s; }
+@keyframes bar{ 0%,100%{ transform:scaleY(.28); } 50%{ transform:scaleY(1); } }
+body:not(.is-playing) .bars i{ animation-play-state:paused; }
+
+.sheet__empty{
+  padding:22px 18px 26px;
+  font-size:14.5px; line-height:1.6;
+  color:var(--cream-dim);
+}
+.sheet__empty code{
+  font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size:13px;
+  color:var(--amber-hi);
+  background:rgba(255,180,60,.10);
+  padding:1px 6px; border-radius:5px;
+}
+
+/* ==========================================================================
+   7. "CHOOSE YOUR 90'S VOICE"
+   ========================================================================== */
+
+.pick{
+  position:relative;
+  margin:clamp(11px, 2vh, 22px) 0 clamp(8px, 1.3vh, 15px);
+  text-align:center;
+  animation:rise .9s var(--ease) .28s both;
+}
+.pick__line{
+  margin:0;
+  font-family:var(--f-hand);
+  font-weight:400;
+  font-size:clamp(27px, 3.5vw, 46px);
+  line-height:1.02;
+  letter-spacing:.005em;
+  color:var(--cream);
+  text-shadow:
+    0 0 1px rgba(255,240,210,.9),
+    0 0 16px rgba(255,180,60,.55),
+    0 0 42px rgba(255,120,40,.35),
+    0 6px 26px rgba(0,0,0,.55);
+  animation:tube 7s ease-in-out infinite;
+}
+@keyframes tube{
+  0%,100%   { opacity:1; }
+  47%       { opacity:1; }
+  48%       { opacity:.78; }
+  49.2%     { opacity:1; }
+  50.4%     { opacity:.86; }
+  51%       { opacity:1; }
+}
+.pick__swash{
+  display:block;
+  width:min(300px, 58vw);
+  height:15px;
+  margin:1px auto 0;
+  fill:none;
+  stroke:var(--amber);
+  stroke-width:2.1;
+  stroke-linecap:round;
+  filter:drop-shadow(0 0 8px rgba(255,180,60,.6));
+  opacity:.85;
+}
+.pick__swash path{
+  stroke-dasharray:460;
+  stroke-dashoffset:460;
+  animation:draw 1.5s var(--ease) .6s forwards;
+}
+.pick__swash2{ stroke-width:1.2; opacity:.6; animation-delay:.95s !important; }
+@keyframes draw{ to{ stroke-dashoffset:0; } }
+
+/* ==========================================================================
+   8. THE RACK — four VCD cases with enamel nameplates
+   ========================================================================== */
+
+.rack{
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  gap:clamp(10px, 1.7vw, 22px);
+  perspective:1100px;
+  width:100%;
+}
+
+.card{
+  position:relative;
+  display:block;
+  width:clamp(100px, 8.7vw, 128px);
+  padding:0;
+  transform-style:preserve-3d;
+  animation:rise .95s var(--ease) both;
+  animation-delay:calc(.36s + var(--i) * .09s);
+}
+.card__case{
+  position:relative;
+  display:block;
+  aspect-ratio:3 / 4;
+  border-radius:5px 8px 8px 5px;
+  overflow:hidden;
+  background:#1B1109;
+  border:1px solid rgba(246,231,200,.16);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.14) inset,
+    0 20px 34px rgba(0,0,0,.55),
+    0 3px 10px rgba(0,0,0,.4);
+  transition:transform .55s var(--ease), box-shadow .55s var(--ease), border-color .45s;
+  transform-origin:50% 100%;
+}
+.card__art{
+  width:100%; height:100%;
+  object-fit:cover;
+  filter:saturate(.86) contrast(1.03) brightness(.86);
+  transition:filter .55s var(--ease), transform .8s var(--ease);
+}
+.card__spine{                     /* the plastic hinge down the left edge */
+  position:absolute; inset:0 auto 0 0;
+  width:9px;
+  background:linear-gradient(90deg,
+    rgba(255,255,255,.30) 0%, rgba(255,255,255,.05) 42%,
+    rgba(0,0,0,.35) 62%, rgba(0,0,0,0) 100%);
+  mix-blend-mode:screen;
+}
+.card__sheen{
+  position:absolute; inset:0;
+  background:linear-gradient(112deg,
+    rgba(255,255,255,0) 34%, rgba(255,255,255,.34) 48%,
+    rgba(255,255,255,.06) 56%, rgba(255,255,255,0) 66%);
+  transform:translateX(-120%);
+  transition:transform .85s var(--ease);
+  pointer-events:none;
+}
+.card__glow{
+  position:absolute; inset:0;
+  box-shadow:inset 0 0 0 2px var(--c), inset 0 -46px 54px -30px var(--c);
+  opacity:0;
+  transition:opacity .5s var(--ease);
+  pointer-events:none;
+  border-radius:inherit;
+}
+.card__eq{
+  position:absolute; left:9px; bottom:9px;
+  display:none;
+  align-items:flex-end; gap:2.5px;
+  height:15px;
+  filter:drop-shadow(0 0 6px var(--c));
+}
+.card__eq i{
+  width:3px; height:100%;
+  background:var(--c);
+  transform-origin:bottom;
+  animation:bar .82s ease-in-out infinite;
+}
+.card__eq i:nth-child(2){ animation-delay:.16s; }
+.card__eq i:nth-child(3){ animation-delay:.32s; }
+.card__eq i:nth-child(4){ animation-delay:.48s; }
+
+.card__plate{
+  position:relative;
+  display:block;
+  margin:9px auto 0;
+  padding:5px 10px 4px;
+  width:fit-content; max-width:100%;
+  border-radius:3px;
+  background:linear-gradient(180deg, var(--plate-hi) 0%, var(--plate) 46%, #08325B 100%);
+  border:1px solid rgba(255,255,255,.30);
+  box-shadow:0 6px 16px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.35);
+  font-family:var(--f-sign);
+  font-size:clamp(11.5px, 1.05vw, 14px);
+  font-weight:700;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:#F4FAFF;
+  text-shadow:0 1px 2px rgba(0,0,0,.5);
+  white-space:nowrap;
+  transition:transform .5s var(--ease), background .5s, box-shadow .5s;
+}
+.card__plate::before,
+.card__plate::after{        /* the little screws, like the shop's signs */
+  content:'';
+  position:absolute; top:50%; width:3px; height:3px;
+  margin-top:-1.5px;
+  border-radius:50%;
+  background:rgba(255,255,255,.5);
+  box-shadow:0 1px 1px rgba(0,0,0,.6);
+}
+.card__plate::before{ left:3.5px; }
+.card__plate::after{ right:3.5px; }
+
+.card__tag{
+  display:block;
+  margin:4px 0 0;
+  font-family:var(--f-sign);
+  font-size:10.5px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--cream-dim);
+  opacity:0;
+  transform:translateY(-3px);
+  transition:opacity .45s var(--ease), transform .45s var(--ease);
+  text-align:center;
+  white-space:nowrap;
+}
+
+/* hover / focus */
+.card:hover .card__case,
+.card:focus-visible .card__case{
+  transform:translateY(-12px) rotateX(7deg) scale(1.035);
+  box-shadow:0 34px 52px rgba(0,0,0,.62), 0 0 0 1px color-mix(in srgb, var(--c) 45%, transparent);
+  border-color:color-mix(in srgb, var(--c) 55%, transparent);
+}
+.card:hover .card__art,
+.card:focus-visible .card__art{ filter:saturate(1.05) contrast(1.05) brightness(1); transform:scale(1.04); }
+.card:hover .card__sheen,
+.card:focus-visible .card__sheen{ transform:translateX(120%); }
+.card:hover .card__tag,
+.card:focus-visible .card__tag{ opacity:1; transform:translateY(0); }
+.card:hover .card__plate,
+.card:focus-visible .card__plate{ transform:translateY(-3px); }
+.card:active .card__case{ transform:translateY(-6px) scale(1.01); }
+
+/* selected */
+.card.is-live .card__art{ filter:saturate(1.12) contrast(1.06) brightness(1.02); }
+.card.is-live .card__case{
+  transform:translateY(-10px) scale(1.03);
+  border-color:var(--c);
+  box-shadow:0 30px 50px rgba(0,0,0,.6), 0 0 30px -6px var(--c);
+}
+.card.is-live .card__glow{ opacity:.95; }
+.card.is-live .card__eq{ display:flex; }
+.card.is-live .card__plate{
+  background:linear-gradient(180deg,
+    color-mix(in srgb, var(--c) 78%, #fff) 0%,
+    var(--c) 52%,
+    color-mix(in srgb, var(--c) 72%, #000) 100%);
+  color:#160D06;
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
+  box-shadow:0 8px 22px color-mix(in srgb, var(--c) 40%, transparent), inset 0 1px 0 rgba(255,255,255,.5);
+}
+.card.is-live .card__tag{ opacity:1; transform:translateY(0); color:var(--c); }
+
+@keyframes rise{
+  from{ opacity:0; transform:translateY(26px); }
+  to  { opacity:1; transform:translateY(0); }
+}
+
+/* ==========================================================================
+   9. RESPONSIVE
+   ========================================================================== */
+
+/* short-and-wide laptops: trim the vertical rhythm */
+@media (max-height: 800px) and (min-width: 900px){
+  .card{ width:clamp(84px, 7.4vw, 106px); }
+  .card__tag{ display:none; }
+  .deck__glass{ padding:9px 14px; border-radius:18px; }
+  .pick{ margin:9px 0 7px; }
+  .pick__line{ font-size:clamp(26px, 3.3vw, 42px); }
+  .pick__swash{ height:14px; width:min(260px, 52vw); }
+}
+
+/* ---- phones + tablets: the TV comes out of the video and into the page ---- */
+@media (max-width: 899px), (orientation: portrait){
+  body{ overflow-y:auto; overflow-x:hidden; }
+
+  .topbar{
+    padding:10px 12px;
+    padding-top:max(10px, env(safe-area-inset-top));
+    align-items:center;
+  }
+  .topbar__right{ flex-direction:column; align-items:flex-end; gap:6px; }
+  .credit{ font-size:11px; letter-spacing:.10em; gap:4px; }
+  .credit__name{ font-size:16px; }
+
+  .dev{ width:min(250px, calc(100vw - 20px)); padding:14px 14px 10px; border-radius:14px; }
+  .dev__name{ font-size:25px; }
+  .dev__link{ height:38px; font-size:12.5px; }
+  .btn{ height:34px; padding:0 12px; font-size:12.5px; }
+  .btn svg{ width:15px; height:15px; }
+  .live{ height:34px; padding:0 11px; font-size:11.5px; }
+  .live__label{ display:none; }
+  .topbar__links .btn span{ display:none; }
+  .topbar__links .btn{ width:34px; padding:0; justify-content:center; }
+  .btn--home span{ display:inline; }
+
+  /* ---- the shop band ---- the JS lays the footage across the top and writes
+     --band-bottom, so the page can start exactly where the shop ends. */
+  body{
+    background:
+      radial-gradient(130% 52% at 50% 0%, #1C1108 0%, rgba(14,9,6,0) 62%),
+      var(--ink);
+  }
+  .stage__grade{
+    background:
+      linear-gradient(180deg, rgba(9,5,3,.16) 0%, rgba(9,5,3,0) 20%),
+      linear-gradient(0deg, var(--ink) 0%, rgba(9,5,3,.74) 9%, rgba(9,5,3,0) 34%),
+      radial-gradient(120% 100% at 50% 40%, rgba(0,0,0,0) 52%, rgba(9,5,3,.5) 100%);
+  }
+
+  .shell{ padding:0 14px 26px; }
+  .shell__air{ flex:0 0 auto; min-height:calc(var(--band-bottom, 300px) + 14px); }
+
+  /* ---- the TV ---- no plastic set on phones: the video plays inside the real
+     CRT in the footage, exactly like desktop, just smaller. */
+  .tv-slot{ display:none; }
+
+  /* ---- singer backdrops ---- the singer stands at about 61% across in every
+     photo, so a straight centre crop pushes them off the right edge. */
+  .backdrop{ background-position:61% center; }
+
+  .deck{ width:100%; }
+  .sound-nudge{ right:0; font-size:11.5px; padding:7px 12px; letter-spacing:.10em; }
+  .deck__glass{
+    grid-template-columns:auto minmax(0,1fr);
+    grid-template-areas:'disc mid' 'ctl ctl';
+    gap:12px 14px;
+    padding:13px 14px 9px;
+  }
+  .deck__disc{ grid-area:disc; width:56px; }
+  .deck__mid{ grid-area:mid; }
+  .deck__controls{
+    grid-area:ctl;
+    justify-content:center;
+    gap:14px;
+    padding-top:4px;
+    border-top:1px solid rgba(246,231,200,.09);
+    margin-top:2px;
+  }
+  .ctl--list{ margin-left:8px; }
+
+  .pick__line{ font-size:clamp(28px, 8.6vw, 42px); }
+  .pick__swash{ width:min(280px, 74vw); height:18px; }
+
+  .rack{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:clamp(11px, 3vw, 15px);
+    max-width:272px;
+    margin:0 auto;
+  }
+  .card{ width:100%; }
+  .card__plate{ font-size:10.5px; letter-spacing:.08em; padding:5px 7px 4px; }
+  .card__tag{ font-size:10px; }
+
+  .sheet{
+    width:calc(100vw - 24px);
+    max-height:56vh;
+  }
+}
+
+@media (max-width: 380px){
+  .rack{ gap:10px; max-width:244px; }
+  .card__plate{ font-size:9.5px; padding:4px 6px 3px; letter-spacing:.06em; }
+  .card__tag{ font-size:9px; }
+  .deck__controls{ gap:10px; }
+}
+
+/* ==========================================================================
+   10. MOTION PREFERENCES
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+  }
+  .deck__disc{ animation:none !important; }
+  .backdrop{ transform:none !important; }
+  .pick__swash path{ stroke-dashoffset:0; }
+}
