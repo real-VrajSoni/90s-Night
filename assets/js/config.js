@@ -20,10 +20,10 @@ const SITE = {
      ------------------------------------------------------------------------ */
 	developer: {
 		name: "Vraj Soni", // shown big on the card
-		role: "Software Developer", // one short line under the name
-		instagram: "https://www.instagram.com/vrajsoni77/", // <-- your Instagram
-		x: "https://x.com/the_vraj_soni", // <-- your X / Twitter
-		linkedin: "https://www.linkedin.com/in/vraj-soni-65095a282/", // <-- your LinkedIn
+		role: "Front-end & product", // one short line under the name
+		instagram: "https://www.instagram.com/PASTE_YOUR_HANDLE", // <-- your Instagram
+		x: "https://x.com/PASTE_YOUR_HANDLE", // <-- your X / Twitter
+		linkedin: "https://www.linkedin.com/in/PASTE_YOUR_HANDLE", // <-- your LinkedIn
 	},
 
 	/* --------------------------------------------------------------------------
