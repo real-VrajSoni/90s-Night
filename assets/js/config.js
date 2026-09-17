@@ -62,7 +62,7 @@ const SITE = {
 			name: "Kumar Sanu",
 			label: "Kumar Sanu · Essentials",
 			playlist:
-				"https://music.youtube.com/playlist?list=OLAK5uy_mBQqIjeNhsCkyprv_cWhBC_C9DXTIgpwo&si=8DSqSD6eGPiqfGbA",
+				"https://music.youtube.com/playlist?list=PLYMLY52eLMxo&si=Xh6DSoqCMrtrc00r",
 			tracks: [],
 			ytMusicUrl: "",
 		},
@@ -71,7 +71,7 @@ const SITE = {
 			name: "Udit Narayan",
 			label: "Udit Narayan · Essentials",
 			playlist:
-				"https://music.youtube.com/playlist?list=OLAK5uy_kLpy8m1mSlrnpT7OcENKGa1kYJXNpu4rQ&si=ae0QEjJxirOiK8A8",
+				"https://music.youtube.com/playlist?list=PLYMLY52eLMxo&si=dFouRqsMLz8SDIex",
 			tracks: [],
 			ytMusicUrl: "",
 		},
@@ -80,7 +80,7 @@ const SITE = {
 			name: "Abhijeet",
 			label: "Abhijeet · Essentials",
 			playlist:
-				"https://music.youtube.com/playlist?list=OLAK5uy_mia8TTVxShg2KJRaa8dB8g2ahomS_0agA&si=e49W1EVpy-1SmKjc",
+				"https://music.youtube.com/playlist?list=PLVz4SdBYJCXk&si=T9Oca0QBT5c90_Jc",
 			tracks: [],
 			ytMusicUrl: "",
 		},
@@ -89,7 +89,7 @@ const SITE = {
 			name: "Sonu Nigam",
 			label: "Sonu Nigam · Essentials",
 			playlist:
-				"https://music.youtube.com/playlist?list=OLAK5uy_kfnpPNuuqbZqIeHQy4cJaj2BgqxAiQ7dg&si=j3hiG-L1qRbIPhQK",
+				"https://music.youtube.com/playlist?list=PLfIEBbnj5BKw&si=7QrxZiYz7iBjs4C3",
 			tracks: [],
 			ytMusicUrl: "",
 		},
