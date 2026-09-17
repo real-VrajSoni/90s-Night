@@ -51,7 +51,7 @@ const SITE = {
 	decks: {
 		/* plays the moment anyone walks in, and every time they press Home */
 		home: {
-			label: "90s Night Mixtape",
+			label: "90's night special",
 			playlist:
 				"https://music.youtube.com/playlist?list=RDCLAK5uy_kNNx8o3LyD3XF_wKmbZZRMsdiYpo5GjrM&playnext=1&si=HY94kJgLane42mov",
 			tracks: [],

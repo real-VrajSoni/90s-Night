@@ -15,7 +15,7 @@ needs touching.
 
 ```js
 home: {
-  label:    '90s Night Mixtape',
+  label:    "90's night special",
   playlist: 'https://www.youtube.com/playlist?list=PLxxxxxxxxxxxxxxxx',
 }
 ```
