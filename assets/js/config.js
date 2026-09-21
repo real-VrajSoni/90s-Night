@@ -62,7 +62,7 @@ const SITE = {
 			name: "Kumar Sanu",
 			label: "Kumar Sanu · Essentials",
 			playlist:
-				"https://music.youtube.com/playlist?list=PLYMLY52eLMxo&si=Xh6DSoqCMrtrc00r",
+				"https://music.youtube.com/playlist?list=PLKqLTmLi7c4w&si=A66t-_nsEXAJ4eHZ",
 			tracks: [],
 			ytMusicUrl: "",
 		},
