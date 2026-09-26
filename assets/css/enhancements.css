@@ -1,0 +1,149 @@
+/* Small additions to the original listening room. The scene stays the homepage. */
+[hidden] { display:none !important; }
+body.is-silent .ctl--play .i-play { display:block; }
+body.is-silent .ctl--play .i-pause { display:none; }
+button:disabled { cursor:not-allowed; opacity:.45; }
+.deck__extras {
+  display:flex; align-items:center; justify-content:center; gap:15px;
+  padding:10px 8px 0; color:var(--cream-dim);
+}
+.deck__extra {
+  display:inline-flex; align-items:center; gap:5px; min-height:28px;
+  font-family:var(--f-sign); font-size:11px; letter-spacing:.08em;
+  text-transform:uppercase; white-space:nowrap;
+  transition:color .25s, transform .25s;
+}
+.deck__extra svg, .deck__volume svg { width:13px; height:13px; flex:none; }
+.deck__extra:hover { color:var(--amber-hi); transform:translateY(-2px); }
+.deck__extra[aria-pressed="true"] { color:var(--accent); }
+.deck__volume { display:flex; align-items:center; gap:7px; }
+.deck__volume input { width:63px; height:3px; accent-color:var(--accent); cursor:pointer; }
+.player-status {
+  margin:3px 0 0; color:var(--cream); text-align:center;
+  font-size:11px; line-height:1.5; text-shadow:0 2px 8px #000;
+}
+.player-status:empty { display:none; }
+.rack-hint {
+  margin:9px 0 0; font-family:var(--f-sign); font-size:11px;
+  letter-spacing:.12em; color:rgba(246,231,200,.64); text-align:center;
+  text-shadow:0 2px 8px #000;
+}
+.toast {
+  position:fixed; left:50%; top:90px; z-index:60;
+  width:max-content; max-width:calc(100vw - 32px);
+  padding:11px 19px; border:1px solid rgba(255,180,60,.3);
+  border-radius:999px; background:rgba(24,14,8,.93); color:var(--amber-hi);
+  box-shadow:0 10px 40px #0006; backdrop-filter:blur(16px);
+  font-size:12px; text-align:center; pointer-events:none;
+  opacity:0; transform:translate(-50%,-10px);
+  transition:opacity .25s, transform .25s;
+}
+.toast.is-visible, .toast.is-on, .toast.show { opacity:1; transform:translate(-50%,0); }
+body:not(.is-playing) .card__eq i { animation-play-state:paused; }
+@media (min-width:900px) and (max-height:600px) {
+  body { overflow-y:auto; }
+  .shell { min-height:600px; }
+}
+@media (max-width:899px), (orientation:portrait), (max-height:500px) and (pointer:coarse) {
+  .topbar__left { flex-wrap:wrap; gap:6px; max-width:58%; }
+  .topbar__left .live { display:none; }
+  .btn--motion { padding-inline:10px; }
+  .btn--motion span { font-size:11px; }
+  .deck__extras { gap:12px; padding-top:7px; flex-wrap:wrap; }
+  .deck__extra { font-size:10px; }
+  .deck__volume input { width:45px; }
+  .rack-hint { font-size:10px; margin-top:12px; }
+  .toast { top:95px; }
+}
+@media (max-width:380px) {
+  .deck__extras { gap:10px; }
+  .deck__extra span { font-size:9px; }
+  .deck__volume { gap:3px; }
+  .deck__volume input { width:35px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .deck__extra, .toast { transition:none; }
+}
+/* A quiet control strip, readable against the shelves without another panel. */
+.deck__extras {
+  width:fit-content; max-width:100%; margin:7px auto 0; padding:2px 12px;
+  border-radius:999px; background:rgba(16,10,7,.72);
+  border:1px solid rgba(246,231,200,.09);
+  backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+  color:rgba(246,231,200,.79);
+}
+@media (max-width:899px), (orientation:portrait), (max-height:500px) and (pointer:coarse) {
+  .deck__extras { padding:3px 10px; gap:10px; }
+}
+
+/* Keep the listening room, with controls sized for thumbs and phone insets. */
+@media (max-width:899px), (orientation:portrait), (max-height:500px) and (pointer:coarse) {
+  .topbar {
+    padding-left:max(12px, env(safe-area-inset-left));
+    padding-right:max(12px, env(safe-area-inset-right));
+    background:linear-gradient(#100a07eb, #100a0700);
+  }
+  .topbar__left { max-width:54%; }
+  .btn, .topbar__links .btn { min-width:44px; height:44px; }
+  .credit__name { min-height:44px; }
+  .topbar__right { gap:0; }
+  .shell {
+    padding-left:max(14px, env(safe-area-inset-left));
+    padding-right:max(14px, env(safe-area-inset-right));
+    padding-bottom:calc(26px + env(safe-area-inset-bottom));
+  }
+  .deck { max-width:560px; }
+  .deck__glass { gap:8px 14px; }
+  .deck__controls { gap:16px; padding-top:8px; }
+  .ctl { width:48px; height:48px; }
+  .ctl--play { width:56px; height:56px; }
+  .ctl--list { margin-left:0; }
+  .deck__seek {
+    height:44px; margin-top:0; border-radius:0; touch-action:none;
+    background:linear-gradient(rgba(246,231,200,.18), rgba(246,231,200,.18)) center / 100% 4px no-repeat;
+    overflow:visible; box-shadow:none;
+  }
+  .deck__seek::before { inset:0; }
+  .deck__seekfill { top:20px; bottom:auto; height:4px; border-radius:4px; }
+  .deck__time { margin-top:-6px; font-size:12px; }
+  .deck__extras {
+    display:grid; grid-template-columns:repeat(2, minmax(0, 1fr));
+    width:100%; gap:0 8px; padding:4px 12px; border-radius:16px;
+  }
+  .deck__extra { min-height:44px; justify-content:center; font-size:11px; }
+  .deck__extra span { font-size:11px; }
+  .deck__extra svg, .deck__volume svg { width:16px; height:16px; }
+  .deck__volume {
+    grid-column:1 / -1; min-height:48px; gap:12px;
+    border-top:1px solid rgba(246,231,200,.09); padding-inline:12px;
+  }
+  .deck__volume input { flex:1; min-width:0; width:100%; height:44px; margin:0; }
+  .player-status { font-size:12px; margin-top:8px; }
+  .sound-nudge {
+    position:static; min-height:44px; margin:10px auto 0;
+    justify-content:center; animation:none;
+  }
+  .rack { max-width:340px; width:100%; gap:16px; }
+  .card__plate { font-size:11px; }
+  .card__tag { font-size:10px; }
+  .sheet {
+    top:auto; bottom:max(8px, env(safe-area-inset-bottom));
+    width:min(560px, calc(100vw - 24px - env(safe-area-inset-left) - env(safe-area-inset-right)));
+    max-height:70vh; max-height:70dvh;
+    background:linear-gradient(180deg, #21160ff5, #0c0805fa);
+  }
+  .sheet__top { flex-shrink:0; align-items:center; }
+  .sheet__x { width:44px; height:44px; }
+  .sheet__list { min-height:0; }
+  .row { min-height:56px; }
+  .dev { max-height:calc(100dvh - 110px); overflow-y:auto; overscroll-behavior:contain; }
+  .dev__link { min-height:44px; }
+  button, a, input { touch-action:manipulation; }
+}
+@media (max-width:380px) {
+  .credit__made, .credit__by { display:none; }
+  .deck__controls { gap:10px; }
+}
+@media (hover:none) {
+  .deck__extra:hover, .row:hover { transform:none; }
+}

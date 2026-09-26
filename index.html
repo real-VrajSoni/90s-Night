@@ -11,10 +11,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&family=Yesteryear&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="assets/css/style.css" />
+<link rel="stylesheet" href="assets/css/enhancements.css" />
+<link rel="stylesheet" href="assets/css/effects.css" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>📼</text></svg>" />
 </head>
 <body class="is-home is-booting">
 
+  <div class="scene-depth" id="sceneDepth" aria-hidden="true">
   <!-- ============ BACKGROUND ============ -->
   <div class="stage" id="stage" aria-hidden="true">
     <video class="stage__video" id="shopVideo" src="assets/video/shop-loop.mp4"
@@ -39,6 +42,8 @@
     <div class="tv__stand"></div>
   </div>
 
+  </div>
+
   <!-- ============ HEADER ============ -->
   <header class="topbar">
     <div class="topbar__left">
@@ -46,11 +51,12 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.4 12 4l8 7.4V20a1 1 0 0 1-1 1h-4.6v-5.6H9.6V21H5a1 1 0 0 1-1-1z"/></svg>
         <span>Home</span>
       </button>
-      <div class="live" id="live" title="People in the shop right now">
+      <div class="live" id="live" title="The shop is always open for a rewind">
         <span class="live__dot"></span>
-        <span class="live__n" id="liveN">1</span>
-        <span class="live__label">listening now</span>
+        <span class="live__n" id="liveN" hidden></span>
+        <span class="live__label">shop is open</span>
       </div>
+      <button class="btn btn--motion" id="motionBtn" type="button" aria-pressed="true" title="Toggle interactive 3D effects"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 9 5v10l-9 5-9-5V7zm0 2.3L5.1 8 12 11.9 18.9 8zM5 9.8v6l6 3.4v-5.6zm8 9.4 6-3.4v-6l-6 3.8z"/></svg><span data-motion-label>3D on</span></button>
     </div>
 
     <div class="topbar__right">
@@ -63,11 +69,11 @@
                 title="Developer contact &amp; credits">Vraj Soni</button>
       </div>
       <div class="topbar__links">
-        <a class="btn btn--ghost" id="ytmBtn" href="#" target="_blank" rel="noopener">
+        <a class="btn btn--ghost" id="ytmBtn" aria-label="Open YouTube Music" href="#" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20m0 3.5A6.5 6.5 0 1 1 5.5 12 6.5 6.5 0 0 1 12 5.5M10 8.6v6.8L16 12z"/></svg>
           <span>YT Music</span>
         </a>
-        <a class="btn btn--ghost" id="igBtn" href="#" target="_blank" rel="noopener">
+        <a class="btn btn--ghost" id="igBtn" aria-label="Open Instagram" href="#" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.6 2h8.8A5.6 5.6 0 0 1 22 7.6v8.8a5.6 5.6 0 0 1-5.6 5.6H7.6A5.6 5.6 0 0 1 2 16.4V7.6A5.6 5.6 0 0 1 7.6 2m0 2A3.6 3.6 0 0 0 4 7.6v8.8A3.6 3.6 0 0 0 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6A3.6 3.6 0 0 0 16.4 4zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10m0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6m5.6-3.1a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4"/></svg>
           <span>Instagram</span>
         </a>
@@ -86,7 +92,7 @@
     <section class="deck" id="deck" aria-label="Music player">
       <div class="deck__glass">
         <div class="deck__disc" id="disc">
-          <img id="discArt" alt="" />
+          <img id="discArt" src="assets/img/shop-poster.jpg" alt="" />
           <span class="deck__hole"></span>
           <span class="deck__shine"></span>
         </div>
@@ -115,12 +121,20 @@
             <svg viewBox="0 0 24 24"><path d="M14.6 6H17v12h-2.4zM5 6l9 6-9 6z"/></svg>
           </button>
           <button class="ctl ctl--list" id="listBtn" type="button" title="Show playlist"
-                  aria-label="Show playlist" aria-expanded="false">
+                  aria-label="Show playlist" aria-expanded="false" aria-controls="sheet">
             <svg viewBox="0 0 24 24"><path d="M3 6h12v2H3zm0 5h12v2H3zm0 5h8v2H3zm14-9.6 5 3.1-5 3.1z"/></svg>
           </button>
         </div>
       </div>
 
+      <div class="deck__extras" aria-label="Extra music controls">
+        <button class="deck__extra" id="shuffleBtn" type="button" aria-label="Shuffle" aria-pressed="true" title="Shuffle playlist"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3v3h-2c-3 0-5 3-7 6-1 2-3 4-5 4H2v2h1c3 0 5-3 7-6 1-2 3-4 5-4h2v3l5-4zm0 10v3h-2c-1 0-2-1-3-2l-1 2c1 1 3 2 4 2h2v3l5-4zM2 6v2h1c1 0 2 1 3 2l1-2C6 7 4 6 3 6z"/></svg><span>Shuffle</span></button>
+        <button class="deck__extra" id="repeatBtn" type="button" aria-label="Repeat current song" aria-pressed="false" title="Repeat current song"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m17 1 5 4-5 4V6H6a2 2 0 0 0-2 2v2H2V8a4 4 0 0 1 4-4h11zM7 23l-5-4 5-4v3h11a2 2 0 0 0 2-2v-2h2v2a4 4 0 0 1-4 4H7z"/></svg><span>Repeat</span></button>
+        <button class="deck__extra" id="surpriseBtn" type="button" title="Play a surprise voice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 2.8 7.2L22 12l-7.2 2.8L12 22l-2.8-7.2L2 12l7.2-2.8z"/></svg><span>Surprise me</span></button>
+        <button class="deck__extra" id="sleepBtn" type="button" aria-label="Sleep timer off" title="Sleep timer: off, 15, 30 or 60 minutes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 14.5A9 9 0 0 1 9.5 3a9.5 9.5 0 1 0 11.5 11.5z"/></svg><span id="sleepLabel">Sleep</span></button>
+        <label class="deck__volume" title="Volume"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h4l5-4v14l-5-4H3zm12-2v2a4 4 0 0 1 0 6v2a6 6 0 0 0 0-10zm3-3v2a8 8 0 0 1 0 12v2a10 10 0 0 0 0-16z"/></svg><input id="volume" type="range" min="0" max="100" value="85" aria-label="Volume"></label>
+      </div>
+      <p class="player-status" id="playerStatus" role="status"></p>
       <button class="sound-nudge" id="soundNudge" type="button" hidden>
         <svg viewBox="0 0 24 24"><path d="M4 9h3.5L12 5v14l-4.5-4H4zm12.5-1.8a5.2 5.2 0 0 1 0 9.6v-2.2a3 3 0 0 0 0-5.2z"/></svg>
         Tap for sound
@@ -153,6 +167,7 @@
     <!-- ---- CARDS ---- -->
     <nav class="rack" id="rack" aria-label="Singers"></nav>
 
+    <p class="rack-hint">Pick a voice. Let the good old days play.</p>
     <div class="shell__floor"></div>
   </main>
 
@@ -185,7 +200,11 @@
     <p class="dev__hint">click anywhere to close</p>
   </aside>
 
+  <div class="toast" id="toast" role="status"></div>
   <script src="assets/js/config.js"></script>
-  <script src="assets/js/app.js"></script>
+  <script src="assets/js/playlist-snapshots.js"></script>
+  <script src="assets/js/playback-availability.js"></script>
+  <script src="assets/js/app.js?v=20260926-mobile"></script>
+  <script src="assets/js/effects.js"></script>
 </body>
 </html>

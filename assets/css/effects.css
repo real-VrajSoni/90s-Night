@@ -1,0 +1,212 @@
+/* Physical details for the original shop. The room, player and rack keep
+   their original positions; all new movement is composed on separate layers. */
+
+#sceneDepth{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  transform-origin:50% 50%;
+}
+.motion-enabled #sceneDepth{
+  transform:translate3d(var(--room-x, 0px), var(--room-y, 0px), 0) scale(1.018);
+  will-change:transform;
+}
+
+.cassette-lift,
+.cassette-tilt,
+.cassette-flight{
+  position:relative;
+  display:block;
+  width:100%;
+  transform-style:preserve-3d;
+}
+.cassette-lift{
+  perspective:650px;
+  transition:transform .6s cubic-bezier(.2,.8,.2,1);
+}
+.cassette-tilt{
+  transform:rotateX(var(--case-rx, 0deg)) rotateY(var(--case-ry, 0deg));
+}
+.cassette-flight{ transform:translateZ(0); }
+
+/* The clipped original cover is the front face. New sides live outside its
+   overflow boundary so the jewel case has real thickness when it turns. */
+.motion-ready .card .card__case,
+.motion-ready .card:hover .card__case,
+.motion-ready .card:focus-visible .card__case,
+.motion-ready .card:active .card__case,
+.motion-ready .card.is-live .card__case{
+  transform:translateZ(6px);
+  transform-origin:center;
+  backface-visibility:hidden;
+}
+.motion-enabled .card.is-live .cassette-lift{ transform:translateY(-10px); }
+.motion-enabled .card:hover .cassette-lift,
+.motion-enabled .card:focus-visible .cassette-lift{ transform:translateY(-15px) scale(1.025); }
+.motion-enabled .card:active .cassette-lift{ transform:translateY(-8px) scale(1.01); }
+.motion-enabled .card:focus-visible .cassette-tilt{ transform:rotateX(8deg) rotateY(-12deg); }
+.motion-enabled .card.is-live .card__case{
+  box-shadow:0 22px 36px rgba(0,0,0,.58), 0 0 28px -8px var(--c), inset 0 1px 0 rgba(255,255,255,.3);
+}
+.cassette-face{
+  position:absolute;
+  display:block;
+  pointer-events:none;
+  backface-visibility:hidden;
+  border:1px solid rgba(246,231,200,.24);
+}
+.cassette-face--back{
+  inset:0;
+  border-radius:7px;
+  transform:translateZ(-6px) rotateY(180deg);
+  background:
+    linear-gradient(0deg, transparent 19%, rgba(237,201,136,.18) 19.5% 20.5%, transparent 21%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 4px),
+    linear-gradient(135deg, #3a2a1a, #17110c 65%, #3b2c1b);
+  box-shadow:inset 0 0 0 5px #18110b, inset 0 0 0 6px rgba(246,231,200,.2);
+}
+.cassette-face--back::before,
+.cassette-face--back::after{
+  content:'';
+  position:absolute;
+  top:37%;
+  width:24%;
+  aspect-ratio:1;
+  border-radius:50%;
+  border:4px solid rgba(229,208,167,.45);
+  background:repeating-conic-gradient(#c8b793 0 12deg, #33271a 12deg 60deg);
+  box-shadow:0 0 0 4px rgba(0,0,0,.45), inset 0 0 0 5px #19120d;
+}
+.cassette-face--back::before{ left:18%; }
+.cassette-face--back::after{ right:18%; }
+.cassette-back-label{
+  position:absolute;
+  top:13%;
+  left:12%;
+  right:12%;
+  padding:3px 0;
+  font:600 9px var(--f-sign);
+  letter-spacing:.18em;
+  text-align:center;
+  color:#e3c795;
+  border-block:1px solid rgba(227,199,149,.3);
+}
+.cassette-face--left,
+.cassette-face--right{
+  top:0;
+  bottom:0;
+  width:12px;
+  background:repeating-linear-gradient(0deg, #34291b 0 3px, #20170d 3px 5px);
+}
+.cassette-face--left{ left:-6px; transform:rotateY(-90deg); }
+.cassette-face--right{ right:-6px; transform:rotateY(90deg); }
+.cassette-face--top,
+.cassette-face--bottom{
+  left:0;
+  right:0;
+  height:12px;
+  background:linear-gradient(0deg, #191109, #81705a 46%, #302317 54%, #1b120b);
+}
+.cassette-face--top{ top:-6px; transform:rotateX(90deg); }
+.cassette-face--bottom{ bottom:-6px; transform:rotateX(-90deg); }
+.cassette-glint{
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity .45s ease;
+  background:
+    radial-gradient(100% 68% at var(--glint-x, 50%) var(--glint-y, 25%), rgba(255,244,212,.32), transparent 65%),
+    linear-gradient(125deg, transparent 34%, rgba(255,246,228,.11) 48%, transparent 63%);
+}
+.motion-enabled .card:hover .cassette-glint,
+.motion-enabled .card:focus-visible .cassette-glint{ opacity:1; }
+.motion-enabled .card.is-turning .cassette-glint{ opacity:.72; }
+
+/* A few softly focused motes carry the warm shop light into the foreground. */
+.room-atmosphere{
+  position:fixed;
+  inset:0;
+  z-index:4;
+  overflow:hidden;
+  pointer-events:none;
+  opacity:0;
+  transition:opacity 1.2s ease;
+  perspective:600px;
+}
+.motion-enabled .room-atmosphere{ opacity:1; }
+.room-mote{
+  position:absolute;
+  top:var(--mote-y);
+  left:var(--mote-x);
+  width:var(--mote-size);
+  height:var(--mote-size);
+  border-radius:50%;
+  background:#ffe0a6;
+  box-shadow:0 0 7px 2px rgba(255,182,69,.12);
+  opacity:0;
+  animation:shop-dust var(--mote-duration) ease-in-out infinite;
+  animation-delay:var(--mote-delay);
+  animation-play-state:paused;
+}
+.motion-enabled .room-mote{ animation-play-state:running; }
+@keyframes shop-dust{
+  0%,100%{ opacity:0; transform:translate3d(0, 20px, var(--mote-depth)); }
+  20%{ opacity:var(--mote-opacity); }
+  70%{ opacity:var(--mote-opacity); }
+  90%{ opacity:0; }
+  99%{ transform:translate3d(var(--mote-drift), -100px, var(--mote-depth)); }
+}
+.tape-particles{
+  position:fixed;
+  inset:0;
+  z-index:14;
+  overflow:hidden;
+  pointer-events:none;
+}
+.tape-particle{
+  position:absolute;
+  display:block;
+  width:3px;
+  height:3px;
+  border-radius:1px;
+  background:#ffd18b;
+  box-shadow:0 0 5px rgba(255,181,61,.4);
+}
+.motion-paused .room-mote{ animation-play-state:paused; }
+.motion-off .deck__disc,
+.motion-off .pick__line,
+.motion-off .live__dot,
+.motion-off .card__eq i,
+.motion-off .dev__tape i,
+.motion-paused .deck__disc,
+.motion-paused .pick__line,
+.motion-paused .live__dot,
+.motion-paused .card__eq i{ animation-play-state:paused !important; }
+body:not(.motion-enabled) .cassette-tilt{ transform:none; }
+body:not(.motion-enabled) .cassette-lift{ transform:none; transition:none; }
+body:not(.motion-enabled) .cassette-glint{ display:none; }
+body:not(.motion-enabled) .tape-particles{ display:none; }
+
+#motionBtn[aria-pressed="true"]{ color:var(--amber-hi); border-color:rgba(255,180,60,.38); }
+#motionBtn:disabled{ opacity:.55; cursor:default; }
+
+@media (max-width:899px), (orientation:portrait){
+  .motion-enabled #sceneDepth{ transform:none; will-change:auto; }
+  .cassette-lift{ perspective:750px; }
+  .room-mote:nth-child(n + 11){ display:none; }
+}
+@media (hover:none){
+  .motion-enabled .card:hover .cassette-lift{ transform:none; }
+  .motion-enabled .card.is-live .cassette-lift{ transform:translateY(-7px); }
+  .motion-enabled .card:hover .cassette-glint{ opacity:0; }
+}
+@media (prefers-reduced-motion:reduce){
+  .room-atmosphere,
+  .tape-particles{ display:none; }
+  .motion-enabled #sceneDepth,
+  .cassette-tilt,
+  .cassette-lift{ transform:none !important; }
+}

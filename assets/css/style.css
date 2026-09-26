@@ -970,7 +970,7 @@ body:not(.is-playing) .bars i{ animation-play-state:paused; }
 }
 
 /* ---- phones + tablets: the TV comes out of the video and into the page ---- */
-@media (max-width: 899px), (orientation: portrait){
+@media (max-width: 899px), (orientation: portrait), (max-height: 500px) and (pointer: coarse){
   body{ overflow-y:auto; overflow-x:hidden; }
 
   .topbar{
